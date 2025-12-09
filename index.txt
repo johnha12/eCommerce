@@ -1,0 +1,72 @@
+design custom database
+- need record or data storage
+- data get storage, even after restarting server
+- express server => data store: users and products
+  => hard drive: products.json users.json
+  note: not suitable for production, just for practice
+  - error if write to file twice at the same time
+  - won't work for multiple servers on different machines
+  - will have to write fs each time to update data
+- later use classes, inheritence, and OOP
+
+different data modeling approaches
+- data store: list of users, list of products. <= objects
+- users repository, products repository
+- users repository: methods, input args, return values, and what they do
+  getAll, getOne, getOneBy, create, update, delete, randomId, writeAll
+  later something similar to products 
+- repository approach vs active record approach
+- data into users.json file
+
+implement user repository
+- save their email, password => store
+  use class to manage.
+- implement class. w/ constructor if needed to make new file
+- nodejs documentation: fs, file system
+- use accessSync for practice => one instance
+  also avoid async + calling it in variable each time
+- if file not found, then write new file: fs.writeFile()
+- cannot have async code inside constructor
+- testing => file created in repository folder, later file will create in main folder
+
+open repo data file
+- in general: prefer to work w/ promises
+- made test function because nodejs requires async/await in functions
+  no top variable can have await
+- fs.writeFileSync(this.filename, '[]'); <= can always assume working with array
+- next create record
+
+saving records
+- create() <= take attribute args
+- users: save email, password
+  write code generic, so that it can be reused
+- password plain text first, then more secured later
+- load file everytime before change
+- remember to put await before calling async functions
+
+better json format
+- JSON.stringify(records, null, 2)
+  2nd arg: custom format
+  3rd arg: level of indentation of string
+
+randomId generation
+- every record stored get randomized id
+- randomId()
+- can use node library to make randomId
+- crypto library
+  later w/ store password too
+  crypto.randomBytes()    <= raw data
+  crypto.randomBytes().toString('hex') <= hex string
+
+finding by id
+
+delete
+- .filter() <= will retain elements if true
+
+update
+- need: id, attributes
+- this.getAll() <= revisit later
+- copy all attributes to reocrd => Object.assign(record, attrs); 
+  will add any additional records/update
+
+
