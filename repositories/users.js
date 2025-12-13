@@ -1,6 +1,8 @@
 const fs = require('fs');
 const crypto = require('crypto');
 const { get } = require('http');
+const util = require('util');
+const scrypt = util.promisify(crypto.scrypt);
 
 class UsersRepository {
   constructor(filename) {
@@ -25,9 +27,33 @@ class UsersRepository {
   async create(attrs) {
     attrs.id = this.randomId();
     // {email: "someemail@gmail.com", password: "somepassword"}
+
+    const salt = crypto.randomBytes(8).toString('hex');
+
+    // use promise for callback. so no need for callback
+    const buf = await scrypt(attrs.password, salt, 64);
+
     const records = await this.getAll();
-    records.push(attrs);
+    const record = {
+      ...attrs,
+      password: `${buf.toString('hex')}.${salt}`
+    }
+    records.push(record);
     await this.writeAll(records);
+
+    return record;
+  }
+
+  async comparePasswords(saved, supplied) {
+    // saved => password in database, 'hashed.salt'
+    const result = saved.split('.');
+    const hashed = result[0];
+    const salt = result[1];
+
+    // script gives back buffer array w/ raw data
+    const hashedSupplyBuffer = await scrypt(supplied, salt, 64);
+
+    return hashed === hashedSupplyBuffer.toString('hex');
   }
 
   async writeAll(records) {
@@ -58,12 +84,22 @@ class UsersRepository {
     Object.assign(record, attrs);
     await this.writeAll(records);
   }
+
+  async getOneBy(filters) {
+    const records = await this.getAll();
+    for (let record of records) {
+      let found = true;
+
+      for (let key in filters) {
+        if (record[key] !== filters[key]) {
+          found = false;
+        }
+      }
+      if (found) {
+        return record;
+      }
+    }
+  }
 }
 
-const test = async() => {
-  const repo = new UsersRepository('users.json');
-
-  await repo.update('c19jjjjjj586c5', {password: 'mypassword'});
-}
-
-test()
+module.exports = new UsersRepository('users.json');
