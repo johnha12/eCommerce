@@ -1,0 +1,177 @@
+structuring js projects
+
+
+project structure
+- lots of code in index.js
+- refactor into other files, then link back up
+- directories: routes, repositories, views
+- will have lots of html
+- views directory: all html pages
+
+structure refactor
+- make new directory: routes/admin/auth.js
+- then make sub router
+  router. make auth.js => require in index.js, link into app
+- making new file:
+  const express = require('express');
+  const usersRepo = require('../../repositories/users');
+  const router = express.Router();
+  //at end
+  module.exports = router;
+- link back to index.js
+  const authRouter = require('./routes/admin/auth');
+  app.use(authRouter);
+
+html template function
+- multiple html in views folder
+- each file returns 1 snippit of html
+- express => generate html
+- all template export function => return string for html
+  pass args if needed
+- already branching lots of directories
+- module.exports = ... <= expect object for arg
+  need many args, and no need to add arg1, arg2...
+- when require directories, no need for extention. ex. file > file.js
+
+html reuse and layouts
+- deficiencies
+- browser interpret div as partial html doc 
+- instead of snippit, should instead send whole html doc 
+- send entire html. can add scripts and stuff clearly
+- identical html structure, don't repeat yourself
+- make layout, then stick whatever into it
+
+building layout file
+- make another layout file
+  then add the arg/content in ${}, within the body
+- now no need to repeat whole html file
+- now if we need to add small things like script tag, 
+  can add once to layout
+- next, last big fix
+
+adding better form validation
+- last big issue
+- stay on one page, even if error occur
+- right now, have seperate error page
+- make a convenient way for validation
+  use library
+- express validator 
+  npm i express-validator
+  pass arg => array of checks
+- check([string of property]).[some validation]
+- sanitization 
+  ex. trim value. like leading/trailing spaces
+- validation is conforming to a structure
+- sanitization is adjusting input
+
+recieving valid input
+- const errors = validationResult(req);
+  errors will be an array of objects.
+  param, error message, and so on
+- later give user a message, ex. password must be between 4-20 chars
+- next improve messaging
+
+adding custom validator
+- check if user exist
+- check if passwords are the same
+- currently middleware and at if statments
+- so want to merge into one section
+- custom() => now have one source to view errors
+- next show user why submission failed
+- later condense validation logic
+
+extracting validation chains
+- write validation chains in one file, then export
+  for easy use
+- next show error on original form
+
+display error messages
+- if error, rerender form, don't create account
+- errors property will show up only if we re-render signup.
+  not for original signup
+  errors is either undefined or array of objects
+- errors.mapped()[prop].msg
+  mapped(): gives us big object
+  [prop]: gives us each property of object
+  msg: gives us error message
+    error may be undefined, prop may not have corisponding object 
+
+validation around sign in
+- put validators in args first, later will move and export
+- doesn't make sense to validate sign in password
+  later when make more secure in code,
+  user should know
+- now check for valid user
+  also to compare passwords
+- have to do email check for every property <= express validator
+- next feed errors into template
+
+template helper functions
+- rerender when error
+  print appropriate error
+- if signinTemplate require errors as arg, bug when no arg is passed.
+  so at least pass in empty object, {}
+- next add styling
+
+add styling
+- added styling from template
+- correct way to ref link w/ express
+
+exposing public directories
+- right now using express => all routes go into app.js/index.js
+- im guessing need to make an app.route(something)
+- make public directory
+- never put secret code in public
+- place css file into public. 
+  still need to tell express to make public, from index.js
+- from now on, every request will be handled by middleware first
+- express will check css file, and main.css
+
+next steps
+- admin panel to let user to create, delete, add products
+- covered lots of express
+- now repeat skills learned
+  form, html, whatnot
+- product listing and panel
+
+product routes
+- make app router, then export it
+- need route to list out different products
+  route to show form, submit form, edit, submit edit, delete
+
+products repository
+- store info
+- methods
+  getAll, getOne, getOneBy, create, update, delete, radomId, writeAll
+  similar to users repository methods 
+- code reuse, inheritence, class reuse
+  users, and products will extend from parent class, then customize
+
+code reuse with classes
+- going to make a class then other classes can extend from it
+- going to keep specific user.js stuff in there.
+- extends, will copy parent class onto current class
+  later can override or add functions
+- now make create function for generic things in parent class
+
+creating products repository
+- products.js (in repositories) extends Repository
+  also writes new json file
+- products.js (in admin) require products.js in repositories
+
+building product creation form
+- eventually create form to create product
+- input, price, image, create form
+- create form, later upload image
+- views/admin/products/new => pass in empty object because later
+  want to pass in error object
+
+some quick validation
+- add some validation and sanitization => title and price
+- send back form if there is error
+- customize error msg
+
+
+
+
+

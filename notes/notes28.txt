@@ -1,0 +1,77 @@
+production grade authentication
+
+cookies
+- online, how it works in general
+- request  cookies (small string of chars)
+- server sends cookie back. want to have cookie back during ever request
+- browser sends request w/ cookie
+- brower send request to server w/ credintials.
+  server compares credintials for matching in database
+  server sends cookie to browser
+- cookie is encrypted
+- can hackers use cookies to access server??
+- create record when user signed up. give users cookie! brower will manage that
+
+creating user records
+- can use express to manage cookie for user
+- but will use 3rd party api
+- terminal: npm install cookie-session      <-------------------------------------------
+
+fetch a session
+- const cookieSession = require('cookie-session');
+- for app function, cookie stored in req arg
+- req.session is added by cookieSession
+  can append as many properties to it as i want 
+  req.session === {}
+- next refactor code, more elegant, less vulnerabilites
+
+sign out user
+- also can sign back in
+- clear cookie => req.session = null;
+- following function async because i'll look up records:
+  app.post('/signin', async (req, res) => {});
+
+sign in
+- has credintials to sign in
+- compare password to record => success or fail
+- next security hold
+
+hash password
+- very important to not store passwords in plain text
+- it's for the security of the users
+- hashing algorithm
+- SHA 256 is one hashing algorithm
+- cannot reverse hash
+- store hashed output, not original input
+- compare hash input and hash datastorage
+- next see another security hold
+
+salting passwords
+- rainbow table attack:
+  melicious user may hash common passwords, then compare to records
+- salt: random string of chars
+- give every users unquie salt
+- salt password, then hash
+- database store random salt
+  use seperator char
+- use random salt and add to input password, then hash whole string
+- if hashed stored value === hashed input+salt, then log in
+- 20 lines of simple code
+
+salting and hashing passwords
+- where to put code => users repo
+  generate salt.
+- nodejs.org: crypto randomBytes, scrypt
+- store: hashed password+salt, then ".", then salt
+  ex password+salt.salt
+
+comparing hashed passwords
+- saved => password in database, 'hashed.salt'
+- supply <= from user
+- .split('.') to take salt
+
+testing full flow 
+- next clean structure
+
+
+
