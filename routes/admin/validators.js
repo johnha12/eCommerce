@@ -4,11 +4,13 @@ const usersRepo = require('../../repositories/users');
 module.exports = {
   requireTitle: check('title')
     .trim()
-    .isLength({min: 5, max: 40}),
+    .isLength({min: 5, max: 40})
+    .withMessage('must be between 5-40 chars'),
   requirePrice: check('price')
     .trim()
     .toFloat()
-    .isFloat({ min: 1 }),
+    .isFloat({ min: 1 })
+    .withMessage('must be greater than 1'),
   requireEmail: check('email').trim().normalizeEmail().isEmail()
     .custom(async (email) => {
       const existingUser = await usersRepo.getOneBy({ email });

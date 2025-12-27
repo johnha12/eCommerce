@@ -1,0 +1,153 @@
+Building a shopping cart
+
+general notes/questions
+- how will I deploy this w/ express and other installing things?
+
+edit a product
+- add validators, and stuff
+- editTemplate isn't perfect right now <= validation error
+- call update function
+- need to handle error for productsRepo.update()
+  for now, wrap in try catch
+- later test image upload when able to see image
+- right now cannot handle error such as invalid title
+  working on this next
+
+fixing the hanleErrors middleware
+- handleErrors recieve template if validator go wrong 
+- edit.js passes product property instead of error 
+- if there's error => product property is undefined
+  meaning no title and price. => cannot read property of undefined
+- need to give extra data for template to render
+- give handleErrors an optional 2nd arg 
+  a function that only executes if something went wrong w/ validation step
+  has data to forward to template
+
+fixing handleErrors middleware
+- { errors, ...data} <= merges keys/values of data into error
+- edit.js isn't using error field yet
+
+deleting a product
+- use form element, instead of anchor tag
+  want post request, not get request
+  cannot use form for delete request, so use post request to delete
+- add action to specify which one to delete
+- use previously made delete function
+- next user and shopping cart
+
+starting w/ seed data
+- product, image, button for user to add to cart
+- cart link with summary of products they have
+- replaced products.json with a file of sample data
+- Q: base64 encoded images <= can ask ai how that works.
+  pretty cool no need to store physical image
+
+user facing products
+- now main landing page
+- get product
+- hardest => cart mechanics
+- create files
+  files of different routes may have same name.
+  but best approach to show their purpose
+- new router and wire up to main directory
+- home directory is async because eventually want to see all products
+- next show different views for products,
+  want different layout too
+
+products index
+- can make template to map/iterate over { products }.
+- recall map return array of strings, we want to join and have 1 string 
+  so .join('') at the end 
+- so make a list of <li>, then put that in 1 <ul>
+- next add html and layout
+
+merging more styling
+- next work on cart
+
+understanding the shopping cart
+- want user to be able to add to cart
+  then ultimately show the cart of everything they added
+- how to tie cart to user not signed in?
+  - should not need to log in 
+  A: when user sends post request, have id of product sent to express server.
+    logic in backend.
+    generate shopping cart w/ random id.
+    set cart id in cookie for that user.
+    cookie managed by browser
+- how to tie product to cart, if signed in
+  - what will shopping cart look like?
+  A: different approaches.
+    bad: carts property in products repository. 
+      cons: iterate over entire list/view cart
+    bad: carts repository, store every cart.
+      cons: any update to product, price will not be reflected on carts repo.
+      or update every object in repo
+    good: products repo and cart repo. cart will generate/new record on carts repo
+    now only store id of product, and quantity of product.
+    then review cart and use it to look up product by id.
+    now product can be updated and no worry to update cart.
+    id cart is stored on user cookie.
+    con: operation, little bit more code to look at cart repo and search for product repo
+
+shopping cart boilerplate
+- carts in repo
+- carts.js in routes 
+- link up in root index.js
+- carts router will display and deal with cart related stuff
+  button, post request by form
+  item => shopping cart
+  showing entire shopping cart and products
+  delete button to delete item off the shopping cart 
+
+submission options
+- button wrap in form submission
+- right now button is in footer and in form
+  form => action and method
+- need form to communicate what the current item is 
+- need a handler for route, /cart/products
+  then collect the product id.
+- successfully collected product id.
+- next cart logic. store cart onto user's cookie 
+
+creating a cart
+- adding addtional logic to route handler,
+  assign id to cart
+- lots of edge cases
+  - user comes in for the first time, no previous cart, create one
+  - user came before and adds another product
+    will have id in cookie, go through repo and find cart
+  - does user add same item to cart, so have 2 instead of 1 
+  - no items and need to add new item into cart
+
+adding items to cart
+- const existingItem = cart.items.find(item => item.id === req.body.productId);
+  if (existingItem) {
+    // increment quantity
+    existingItem.quantity++;
+  }
+  pretty good trick. get the property and alter it 
+- after changing cart, need to update in repo 
+
+display cart items
+- cart display page
+- iterate cart items, then iterate products repo
+- for logic and calculation, add product property to carts.json property of object
+
+
+totaling cart items
+
+removing cart items
+- form => post request => remove form element
+  route handler
+- add property to form so we know which item to delete
+- <input hidden value="${item.id}"></input>
+  add hidden input to communicate which item 
+- action="/cart/products/delete" <= added so reader can understand 
+
+redirect on remove
+- find cart associated with user
+  then remove item 
+- update cart
+- redirect back to cart page
+
+

@@ -1,2 +1,134 @@
 image and file upload
 
+exploring image upload
+- quickly add .withMessage()
+- when submit form with file upload, only get name of file
+- next see how to see and recieve submitted file
+
+understand multi part form
+- so far have method POST
+- soon use another method property and change the form
+- method show how to translate info
+- get by default
+- method="", enctype="" <= how to encode info and transport
+- default: enctype="application/x-www-from-urlencoded"
+  so upload file, cannot safely transport by urlencoded
+- use different encoding type: enctype="multipart/form/data"
+- now have different content type
+  can see a lot about image. type, raw data.
+- chrome won't tell dev what is in form data section <= performance concerns
+- also show boundery
+- existing middle won't work for multi form encoded 
+- another middleware for multipart form data
+
+acessing uploaded file
+- bodyParser.urlencoded() currently not sufficient to take file
+  doesn't support multipart bodies, and refer to other resources
+- multer? 
+  install, handle form submission w/ file upload
+- req.file is what I want to save
+- multer wants to save in some location of project
+  some images may be very large
+- npm install multer
+- use upload function from multer => upload is middleware function
+- now have file, then can do something else
+- first talk about image upload
+
+optional: different methods of image storage
+- doing shortcut for now. in my scope. to learn js
+- right way: more code, cost
+
+saving the image
+- works within the scope of my project
+  not best practice
+- raw image stored in buffer property
+- req.file.buffer.toString('base64')
+  will give string that can be stored in json file and be shared later
+- now use create function and pass args
+- subtle bug to fix
+
+subtle middleware bug
+- need to re-send form if error
+  pass in errors object in it 
+- now add into html/new.js
+- price stored as string in json currently. we want float
+  also not able to register new product
+- middleware isn't parsing contents of multipart bodies.
+  using multer => also parse text fields
+- other middleware is active: upload.single('image')
+- middleware works left to right
+  so reorder and put upload.single('image') before other validators
+- parse image before other stuff
+- very important: order of middleware
+
+better styling
+- added styling and class names to new.js
+
+reuse error handling middleware
+- make own middleware
+- trying to not repeat: 
+  const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.send(signinTemplate({ errors }));
+    }
+- make a handleError function and run it before running request
+- middlewares returns a function 
+- use next as arg because that's express before promises
+  only call next when no error occured
+- make use of handlErrors => invoking it.
+
+prduct listing
+- iterate through products
+  so map products
+- want one continous string. so use .join('')
+
+redirect on success actions
+- right now user is taken to "submitted" page
+- want to redirect
+- res.redirect('/admin/products'); <= from creating product
+  now make same changes in signin, signup pages
+
+requiring authentication
+- redirect?
+- user should not be able to access products panel when not signed in
+  add in code to make sure user is signed in before access
+- signup/signin has req.session.userId <= stored in cookie
+  signout => session clears
+- if (!req.session.userId) {return res.redirect('/signin');}
+  heavy code duplication => make middleware function
+- next() is run next middleware or function, show everything went well
+- now can just pass requireAuth middleware into arg of functions
+  no need to call arg within the function.
+- as for order of requiring authentication, do it first.
+  we care if they're signed in before anything else
+
+Id in URLs
+- want user to navigate to a form to edit products
+- edit existing product => prefill forms
+- communicate specific record to route handler 
+- take id and throw into url
+- encode appropriate href/anchor into each edit button
+- note to self: remember to save files 
+  also route handler is cool. app takes care of routes
+
+recieving URL params
+- now set up route for specific product id
+- add wildcard
+  ex. router.get('/admin/products/:id/edit')
+  so anytime user has this route with any id, this will route user
+  console.log(req.params.id); <= params.id captures :id
+- next show attributes of selected product by id 
+- can reuse repository.js getOne()
+- edge case: user can manually type number on search bar for non-existing product
+
+display edit form
+- <input name="title" value="${product.title}"> <= note must have double quotes
+- cannot prepopulate file
+- assume any image add, then user wants to change.
+  if not image add, user wants to not change
+- next handle similar to before, creating product. and also form submission.
+
+
+
+
+
